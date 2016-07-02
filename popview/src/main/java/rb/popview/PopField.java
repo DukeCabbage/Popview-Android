@@ -16,25 +16,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by rb on 18/6/16.
- */
 public class PopField extends View {
 
 	private List<PopAnimator> mPopViews = new ArrayList<>();
 	private int[] mExpandInset = new int[2];
 
-	public PopField(Context context) {
+	private PopField(Context context) {
 		super(context);
 		init();
 	}
 
-	public PopField(Context context, AttributeSet attrs) {
+	private PopField(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
 
-	public PopField(Context context, AttributeSet attrs, int defStyleAttr) {
+	private PopField(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		init();
 	}
@@ -51,13 +48,13 @@ public class PopField extends View {
 		}
 	}
 
-	private void popView(final Bitmap bitmap, final Rect bound
-		, final long startDelay, final long duration) {
+	private void popView(final Bitmap bitmap, final Rect bound, final long startDelay, final long duration) {
 		final PopAnimator pop = new PopAnimator(this, bitmap, bound);
 		pop.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				mPopViews.remove(animation);
+				if (animation instanceof PopAnimator)
+					mPopViews.remove(animation);
 			}
 		});
 		pop.setStartDelay(startDelay);
@@ -89,7 +86,8 @@ public class PopField extends View {
 				popNext.setDuration(duration);
 				mPopViews.add(popNext);
 				popNext.start();
-				mPopViews.remove(animation);
+                if (animation instanceof PopAnimator)
+				    mPopViews.remove(animation);
 			}
 		});
 		pop.setStartDelay(startDelay);
@@ -111,15 +109,8 @@ public class PopField extends View {
 	}
 
 	public void popView (final View view, View addView) {
-		Rect r = new Rect();
-		view.getGlobalVisibleRect(r);
-		int[] location = new int[2];
-		getLocationOnScreen(location);
-		r.offset(-location[0], -location[1]);
-		int startDelay = 0;
-		view.animate().setDuration(150).setStartDelay(startDelay)
-			.scaleX(0f).scaleY(0f).alpha(0f).start();
-		popView(PopUtils.createBitmapFromView(view), r, startDelay, PopAnimator.DEFAULT_DURATION);
+        popView(view);
+
 		ViewGroup parentViewGroup = (ViewGroup) view.getParent();
 		int index = parentViewGroup.indexOfChild(view);
 		parentViewGroup.removeView(view);
@@ -136,8 +127,7 @@ public class PopField extends View {
 			long startDelay = 0;
 			view.animate().setDuration(150).setStartDelay(startDelay)
 				.scaleX(0f).scaleY(0f).alpha(0f).start();
-			popView(PopUtils.createBitmapFromView(view), PopUtils.createBitmapFromView(addView)
-				, view, addView, r, startDelay, PopAnimator.DEFAULT_DURATION);
+			popView(PopUtils.createBitmapFromView(view), PopUtils.createBitmapFromView(addView), view, addView, r, startDelay, PopAnimator.DEFAULT_DURATION);
 		}
 	}
 

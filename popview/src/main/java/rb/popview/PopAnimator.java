@@ -13,9 +13,6 @@ import android.view.animation.Interpolator;
 
 import java.util.Random;
 
-/**
- * Created by rb on 18/6/16.
- */
 public class PopAnimator extends ValueAnimator {
 
 	static long DEFAULT_DURATION = 0x500;
