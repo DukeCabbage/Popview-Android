@@ -44,6 +44,7 @@ public class PopField extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.v("Popfield", "onDraw");
         for (PopAnimator popView : mPopViews) {
             popView.draw(canvas);
         }

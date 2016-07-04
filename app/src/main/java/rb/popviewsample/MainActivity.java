@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.imageview2)
     void onClick2(View view) {
         Log.d(TAG, "image 2 on click");
-        final View addView = inflater.inflate(R.layout.sampleimageview, null);
+        final View addView = inflater.inflate(R.layout.sampleimageview, (ViewGroup)view.getParent(), false);
         ImageView newImageView = (ImageView) addView.findViewById(R.id.sampleimageview);
         newImageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
 
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.imageview3)
     void onClick3(View view) {
         Log.d(TAG, "image 3 on click");
-        final View addView = inflater.inflate(R.layout.sampleimageview, null);
+        final View addView = inflater.inflate(R.layout.sampleimageview, (ViewGroup)view.getParent(), false);
         ImageView newImageView = (ImageView) addView.findViewById(R.id.sampleimageview);
         newImageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         mPopField.popView(view, addView, true);

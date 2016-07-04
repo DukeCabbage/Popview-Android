@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -37,22 +38,27 @@ public class PopAnimator extends ValueAnimator {
     public PopAnimator(View container, Bitmap bitmap, Rect bound) {
         mPaint = new Paint();
         mBound = new Rect(bound);
-        Random random = new Random(System.currentTimeMillis());
-        int noOfParticlesX = (int) (((float) bitmap.getWidth() / bitmap.getWidth())
-                * (float) PARTICLE_COUNT_FACTOR);
-        int noOfParticlesY = (int) (((float) bitmap.getHeight() / bitmap.getWidth())
-                * (float) PARTICLE_COUNT_FACTOR);
+
+        // Divide the view into chunks, column number is PARTICLE_COUNT_FACTOR, row number is in
+        // proportion according to image dimension
         int bitMapWidth = bitmap.getWidth();
         int bitMapHeight = bitmap.getHeight();
+
+        int noOfParticlesX = (int) (((float) bitMapWidth / bitMapWidth)
+                * (float) PARTICLE_COUNT_FACTOR);
+        int noOfParticlesY = (int) (((float) bitMapHeight / bitMapWidth)
+                * (float) PARTICLE_COUNT_FACTOR);
         mParticles = new Particle[noOfParticlesY][noOfParticlesX];
+
         defaultRadius = ((bitMapWidth / (2 * noOfParticlesX)) + (bitMapHeight / (2 * noOfParticlesY))) / 2;
         for (int i = 0; i < noOfParticlesY; i++) {
             for (int j = 0; j < noOfParticlesX; j++) {
-                mParticles[i][j]
-                        = generateParticle(bitmap.getPixel((j * bitMapWidth / noOfParticlesX)
-                        , (i * bitMapHeight / noOfParticlesY))
-                        , mBound.left + (j * defaultRadius * 2)
-                        , mBound.top + (i * defaultRadius * 2), random);
+                // Top-left pixel of each chunk
+                int color = bitmap.getPixel((j * bitMapWidth / noOfParticlesX), (i * bitMapHeight / noOfParticlesY));
+                mParticles[i][j] = generateParticle(color
+                            , mBound.left + (j * defaultRadius * 2)
+                            , mBound.top + (i * defaultRadius * 2)
+                            , new Random(System.currentTimeMillis()));
             }
         }
 
@@ -130,6 +136,10 @@ public class PopAnimator extends ValueAnimator {
             return false;
         }
 
+        float animatedValue = (float) getAnimatedValue();
+
+        Log.v("Pop", "draw, " + noOfDrawsAdvance + ", " + animatedValue);
+
         for (int i = 0; i < mParticles.length; i++) {
             for (int j = 0; j < mParticles[i].length; j++) {
                 if (mIsFollowedUp) {
@@ -151,6 +161,7 @@ public class PopAnimator extends ValueAnimator {
                 } else {
                     noOfDrawsAdvance++;
                     if (noOfDrawsAdvance > totalNoOfDrawsAdvance) {
+                        Log.v("Pop", "exceeds total no of draws");
                         mContainer.invalidate();
                         return true;
                     }
@@ -172,6 +183,7 @@ public class PopAnimator extends ValueAnimator {
     @Override
     public void start() {
         super.start();
+        Log.v("Pop", "start, " + totalNoOfDrawsAdvance);
         mContainer.invalidate(mBound);
     }
 
